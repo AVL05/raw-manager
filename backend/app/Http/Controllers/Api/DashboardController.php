@@ -62,9 +62,9 @@ class DashboardController extends Controller
     public function upcomingSessions(Request $request): JsonResponse
     {
         $sessions = PhotoSession::where('photographer_id', $request->user()->id)
-            ->whereIn('status', [SessionStatus::Pending->value])
+            ->whereIn('status', [SessionStatus::Pending->value, SessionStatus::Confirmed->value])
             ->where('date', '>=', now()->toDateString())
-            ->with('client:id,name,email,phone')
+            ->with('client')
             ->orderBy('date')
             ->limit(5)
             ->get();
