@@ -9,7 +9,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
-      staleTime: 30_000,
+      staleTime: 60_000,        // 1 min — no refetch si los datos son recientes
+      gcTime: 5 * 60_000,       // 5 min en caché antes de borrar
+      refetchOnWindowFocus: false, // no refetch al volver a la pestaña
     },
   },
 })
