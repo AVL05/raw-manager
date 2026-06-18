@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('gallery_images', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('gallery_id')->constrained('galleries')->cascadeOnDelete();
+            $table->string('filename');
+            $table->string('path');
+            $table->string('thumbnail_path')->nullable();
+            $table->unsignedBigInteger('size')->default(0);
+            $table->string('mime_type', 50)->nullable();
+            $table->unsignedSmallInteger('order')->default(0);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('gallery_images');
+    }
+};
