@@ -32,7 +32,7 @@ export default function Sidebar() {
             key={item.to}
             to={item.to}
             className={({ isActive }) =>
-              lex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all 
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${isActive ? 'bg-white/10 text-white font-medium' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'}`
             }
           >
             <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
