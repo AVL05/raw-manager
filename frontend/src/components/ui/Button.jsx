@@ -16,7 +16,7 @@ export default function Button({ children, variant = 'primary', size = 'md', loa
 
   return (
     <button
-      className={${base}   }
+      className={`${base} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={loading || props.disabled}
       {...props}
     >

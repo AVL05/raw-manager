@@ -10,7 +10,7 @@ function StatCard({ label, value, sub, accent }) {
   return (
     <Card className="flex flex-col gap-2">
       <p className="text-sm text-zinc-500">{label}</p>
-      <p className={	ext-3xl font-bold }>{value}</p>
+      <p className={`text-3xl font-bold ${accent || 'text-zinc-100'}`}>{value}</p>
       {sub && <p className="text-xs text-zinc-600">{sub}</p>}
     </Card>
   )
