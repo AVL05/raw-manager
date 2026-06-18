@@ -10,11 +10,11 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       "/api": {
-        target: "http://localhost",
+        target: "http://nginx",
         changeOrigin: true,
       },
       "/storage": {
-        target: "http://localhost",
+        target: "http://nginx",
         changeOrigin: true,
       },
     },
