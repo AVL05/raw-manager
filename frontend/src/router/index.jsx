@@ -15,16 +15,18 @@ import InvoicesPage from '../features/invoices/InvoicesPage'
 import GalleriesPage from '../features/galleries/GalleriesPage'
 import GalleryDetailPage from '../features/galleries/GalleryDetailPage'
 import PublicGalleryPage from '../features/galleries/PublicGalleryPage'
+import ProfilePage from '../features/profile/ProfilePage'
 
 function ProtectedRoute({ children }) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const { isAuthenticated, user } = useAuthStore()
   if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (user?.role && user.role !== 'photographer') return <Navigate to="/login" replace />
   return children
 }
 
 function GuestRoute({ children }) {
-  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />
+  const { isAuthenticated, user } = useAuthStore()
+  if (isAuthenticated && user?.role === 'photographer') return <Navigate to="/dashboard" replace />
   return children
 }
 
@@ -56,6 +58,7 @@ export const router = createBrowserRouter([
       { path: 'invoices', element: <InvoicesPage /> },
       { path: 'galleries', element: <GalleriesPage /> },
       { path: 'galleries/:id', element: <GalleryDetailPage /> },
+      { path: 'profile', element: <ProfilePage /> },
     ],
   },
   { path: '*', element: <Navigate to="/dashboard" replace /> },

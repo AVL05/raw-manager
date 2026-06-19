@@ -8,7 +8,7 @@ on:
 
 jobs:
   backend-tests:
-    name: Backend Tests (PHP 8.2)
+    name: Backend Tests (PHP 8.3)
     runs-on: ubuntu-latest
 
     services:
@@ -29,7 +29,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           extensions: pdo, pdo_mysql, mbstring, bcmath, gd, zip
 
       - name: Install Composer dependencies
@@ -43,8 +43,9 @@ jobs:
       - name: Configure test env
         working-directory: ./backend
         run: |
-          sed -i 's/DB_HOST=db/DB_HOST=127.0.0.1/' .env.testing
           sed -i 's/DB_DATABASE=raw_manager/DB_DATABASE=raw_manager_test/' .env.testing
+          sed -i 's/DB_USERNAME=root/DB_USERNAME=raw_manager/' .env.testing
+          sed -i 's/DB_PASSWORD=$/DB_PASSWORD=secret/' .env.testing
 
       - name: Generate app key
         working-directory: ./backend
@@ -80,5 +81,5 @@ jobs:
         working-directory: ./frontend
         run: npm run build
         env:
-          VITE_API_URL: http://localhost/api
+          VITE_API_URL: /api
           VITE_APP_NAME: RAW Manager

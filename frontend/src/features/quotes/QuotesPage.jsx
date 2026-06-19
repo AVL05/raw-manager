@@ -62,7 +62,7 @@ export default function QuotesPage() {
         <EmptyState
           icon="📋"
           title="Sin presupuestos"
-          description="Crea tu primer presupuesto para una sesion"
+          description="Crea tu primer presupuesto para una sesión"
           action={<Button onClick={() => setShowForm(true)}>Crear presupuesto</Button>}
         />
       ) : (

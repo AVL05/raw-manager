@@ -15,7 +15,7 @@ Gestiona clientes, sesiones fotográficas, presupuestos, facturas y galerías pr
 - [Manual de usuario](#manual-de-usuario)
 - [Referencia de la API](#referencia-de-la-api)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
-- [Desarrollo local sin Docker](#desarrollo-local-sin-docker)
+- [Desarrollo local](#desarrollo-local)
 - [Variables de entorno](#variables-de-entorno)
 - [CI/CD](#cicd)
 - [Licencia](#licencia)
@@ -39,12 +39,12 @@ Gestiona clientes, sesiones fotográficas, presupuestos, facturas y galerías pr
 
 | Capa | Tecnología |
 |---|---|
-| Frontend | React 18 + Vite 6 + Tailwind CSS 4 |
+| Frontend | React 19 + Vite 8 + Tailwind CSS 4 |
 | Estado del cliente | Zustand (auth) + TanStack Query (server state) |
-| Backend | Laravel 11 + Sanctum |
-| Base de datos | MySQL 8 |
-| Servidor | Nginx + PHP-FPM 8.4 |
-| Infraestructura | Docker + Docker Compose |
+| Backend | Laravel 13 + Sanctum |
+| Base de datos | MySQL/MariaDB |
+| Servidor local | Laravel (`php artisan serve`) |
+| Base de datos local | MySQL/MariaDB de XAMPP |
 | CI | GitHub Actions |
 | PDF | barryvdh/laravel-dompdf |
 
@@ -54,10 +54,12 @@ Gestiona clientes, sesiones fotográficas, presupuestos, facturas y galerías pr
 
 ### Requisitos
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) >= 4.x
+- XAMPP con MySQL/MariaDB en el puerto 3306
+- PHP >= 8.3 y Composer
+- Node.js >= 20 y npm
 - Git
 
-No necesitas PHP ni Node instalados localmente — todo corre en contenedores.
+PHP, Composer y Node se ejecutan directamente en el equipo.
 
 ### Instalación
 
@@ -66,20 +68,28 @@ No necesitas PHP ni Node instalados localmente — todo corre en contenedores.
 git clone https://github.com/tu-usuario/raw-manager.git
 cd raw-manager
 
-# 2. Copia el fichero de entorno
-cp backend/.env.example backend/.env
+# 2. Crea la base de datos en XAMPP
+C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE IF NOT EXISTS raw_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 3. Levanta los contenedores (primera vez tarda ~2 min en compilar)
-docker compose up -d --build
+# 3. Instala y configura el backend
+cd backend
+Copy-Item .env.example .env
+composer install
 
 # 4. Genera la clave de aplicación
-docker exec raw_app php artisan key:generate
+php artisan key:generate
 
 # 5. Ejecuta las migraciones y carga datos de demo
-docker exec raw_app php artisan migrate --seed
+php artisan migrate --seed
 
 # 6. Crea el enlace simbólico de storage
-docker exec raw_app php artisan storage:link
+php artisan storage:link
+php artisan serve --host=127.0.0.1 --port=8000
+
+# En otra terminal
+cd frontend
+npm install
+npm run dev
 ```
 
 ### Acceso
@@ -87,8 +97,8 @@ docker exec raw_app php artisan storage:link
 | Servicio | URL |
 |---|---|
 | Frontend (app) | http://localhost:5173 |
-| API | http://localhost/api |
-| Base de datos | localhost:3307 (usuario: `raw_manager`, contraseña: `secret`) |
+| API | http://127.0.0.1:8000/api |
+| Base de datos | 127.0.0.1:3306 (usuario: `root`, sin contraseña por defecto) |
 
 ---
 
@@ -259,7 +269,7 @@ Accede a tu perfil para configurar:
 
 ## Referencia de la API
 
-Base URL: `http://localhost/api`
+Base URL directa: `http://127.0.0.1:8000/api`
 
 Todos los endpoints protegidos requieren el header:
 ```
@@ -386,12 +396,7 @@ raw-manager/
 │       ├── store/              # Zustand (auth)
 │       └── utils/              # Formatters, labels, colores de estado
 │
-├── docker/
-│   ├── nginx/nginx.conf
-│   └── php/Dockerfile + php.ini
-│
-├── .github/workflows/ci.yml   # Tests backend + build frontend
-└── docker-compose.yml
+└── .github/workflows/ci.yml   # Tests backend + build frontend
 ```
 
 ### Modelo de datos
@@ -421,21 +426,21 @@ users ────────────────────────�
 
 ---
 
-## Desarrollo local sin Docker
+## Desarrollo local
 
-Si prefieres trabajar sin Docker:
+La aplicación está preparada para ejecutarse directamente en Windows con
+MySQL/MariaDB de XAMPP.
 
 ### Backend
 
 ```bash
 cd backend
 composer install
-cp .env.example .env
-# Edita .env con tu MySQL local
+Copy-Item .env.example .env
 php artisan key:generate
 php artisan migrate --seed
 php artisan storage:link
-php artisan serve          # http://localhost:8000
+php artisan serve --host=127.0.0.1 --port=8000
 ```
 
 ### Frontend
@@ -443,7 +448,6 @@ php artisan serve          # http://localhost:8000
 ```bash
 cd frontend
 npm install
-# Edita vite.config.js: cambia target de proxy a http://localhost:8000
 npm run dev                # http://localhost:5173
 ```
 
@@ -457,17 +461,18 @@ Las principales variables de `backend/.env`:
 APP_NAME="RAW Manager"
 APP_ENV=local
 APP_KEY=                        # Generada con artisan key:generate
-APP_URL=http://localhost
+APP_URL=http://127.0.0.1:8000
 
-DB_HOST=db                      # Nombre del servicio Docker (o 127.0.0.1 local)
+DB_HOST=127.0.0.1
+DB_PORT=3306
 DB_DATABASE=raw_manager
-DB_USERNAME=raw_manager
-DB_PASSWORD=secret
+DB_USERNAME=root
+DB_PASSWORD=
 
 SANCTUM_STATEFUL_DOMAINS=localhost:5173
 FRONTEND_URL=http://localhost:5173
 
-FILESYSTEM_DISK=public          # Las imágenes se sirven por Nginx
+FILESYSTEM_DISK=local
 ```
 
 ---

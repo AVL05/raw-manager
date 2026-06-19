@@ -29,7 +29,11 @@ class User extends Authenticatable
 
     public function isPhotographer(): bool
     {
-        return $this->role === UserRole::Photographer;
+        $role = $this->role;
+        if ($role instanceof UserRole) {
+            return $role === UserRole::Photographer;
+        }
+        return $role === UserRole::Photographer->value;
     }
 
     public function isClient(): bool

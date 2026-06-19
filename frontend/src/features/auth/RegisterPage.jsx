@@ -37,7 +37,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-zinc-100">RAW Manager</h1>
-          <p className="text-zinc-500 text-sm mt-1">Crea tu cuenta de fotografo</p>
+          <p className="text-zinc-500 text-sm mt-1">Crea tu cuenta de fotógrafo</p>
         </div>
 
         {errors.general && (
@@ -49,14 +49,14 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input label="Nombre" placeholder="Tu nombre" value={form.name} onChange={set('name')} error={errors.name} required />
           <Input label="Correo" type="email" placeholder="tu@email.com" value={form.email} onChange={set('email')} error={errors.email} required />
-          <Input label="Contrasena" type="password" placeholder="Min. 8 caracteres" value={form.password} onChange={set('password')} error={errors.password} required />
-          <Input label="Confirmar contrasena" type="password" placeholder="Repite la contrasena" value={form.password_confirmation} onChange={set('password_confirmation')} error={errors.password_confirmation} required />
+          <Input label="Contraseña" type="password" placeholder="Mín. 8 caracteres" value={form.password} onChange={set('password')} error={errors.password} required />
+          <Input label="Confirmar contraseña" type="password" placeholder="Repite la contraseña" value={form.password_confirmation} onChange={set('password_confirmation')} error={errors.password_confirmation} required />
           <Button type="submit" className="w-full" loading={loading}>Crear cuenta</Button>
         </form>
 
         <p className="text-center text-sm text-zinc-500 mt-6">
-          Ya tienes cuenta?{' '}
-          <Link to="/login" className="text-zinc-300 hover:text-white transition-colors">Inicia sesion</Link>
+          ¿Ya tienes cuenta?{' '}
+          <Link to="/login" className="text-zinc-300 hover:text-white transition-colors">Inicia sesión</Link>
         </p>
       </div>
     </div>

@@ -13,7 +13,7 @@ import {
 } from '../../utils/formatters'
 
 const NEXT_STATUS = { pending: 'confirmed', confirmed: 'done', done: 'delivered' }
-const NEXT_LABEL = { pending: 'Confirmar sesion', confirmed: 'Marcar como realizada', done: 'Marcar como entregada' }
+const NEXT_LABEL = { pending: 'Confirmar sesión', confirmed: 'Marcar como realizada', done: 'Marcar como entregada' }
 
 export default function SessionDetailPage() {
   const { id } = useParams()
@@ -135,20 +135,20 @@ export default function SessionDetailPage() {
 
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-zinc-300">Galeria privada</h3>
+              <h3 className="text-sm font-semibold text-zinc-300">Galería privada</h3>
               {!session?.gallery && (
-                <Button size="sm" onClick={() => navigate('/galleries')}>Crear galeria</Button>
+                <Button size="sm" onClick={() => navigate('/galleries')}>Crear galería</Button>
               )}
             </div>
             {session?.gallery ? (
               <div className="flex items-center justify-between">
                 <p className="text-sm text-zinc-300">{session.gallery.name}</p>
                 <Button variant="ghost" size="sm" onClick={() => navigate('/galleries/' + session.gallery.id)}>
-                  Ver galeria
+                  Ver galería
                 </Button>
               </div>
             ) : (
-              <p className="text-sm text-zinc-600">Sin galeria</p>
+              <p className="text-sm text-zinc-600">Sin galería</p>
             )}
           </div>
         </div>

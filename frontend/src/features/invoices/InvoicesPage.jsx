@@ -34,7 +34,7 @@ function CreateInvoiceForm({ quotes, onSuccess, onCancel }) {
         <option value="">Seleccionar presupuesto...</option>
         {approvedQuotes.map((q) => (
           <option key={q.id} value={q.id}>
-            {'#' + q.id + ' — ' + (q.session?.name ?? 'Sesion') + ' — ' + formatCurrency(q.total)}
+            {'#' + q.id + ' — ' + (q.session?.name ?? 'Sesión') + ' — ' + formatCurrency(q.total)}
           </option>
         ))}
       </Select>
@@ -116,9 +116,9 @@ export default function InvoicesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-800 text-zinc-500 text-xs uppercase tracking-wider">
-                <th className="text-left px-4 py-3">Numero</th>
+                <th className="text-left px-4 py-3">Número</th>
                 <th className="text-left px-4 py-3">Cliente</th>
-                <th className="text-left px-4 py-3 hidden md:table-cell">Emision</th>
+                <th className="text-left px-4 py-3 hidden md:table-cell">Emisión</th>
                 <th className="text-left px-4 py-3 hidden lg:table-cell">Vencimiento</th>
                 <th className="text-left px-4 py-3">Estado</th>
                 <th className="text-right px-4 py-3">Total</th>

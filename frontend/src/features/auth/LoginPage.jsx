@@ -19,7 +19,7 @@ export default function LoginPage() {
       await login(form)
       navigate('/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al iniciar sesion')
+      setError(err.response?.data?.message || 'Error al iniciar sesión')
     } finally {
       setLoading(false)
     }
@@ -30,11 +30,11 @@ export default function LoginPage() {
       <div className="flex-1 hidden lg:flex flex-col justify-between p-12 bg-zinc-900 border-r border-zinc-800">
         <div>
           <h1 className="text-2xl font-bold text-white">RAW Manager</h1>
-          <p className="text-zinc-500 text-sm mt-1">Gestion profesional para fotografos</p>
+          <p className="text-zinc-500 text-sm mt-1">Gestión profesional para fotógrafos</p>
         </div>
         <div>
           <blockquote className="text-3xl font-light text-zinc-200 leading-relaxed">
-            "Tu estudio digital.<br />Cada sesion, cada cliente,<br />cada historia."
+            "Tu estudio digital.<br />Cada sesión, cada cliente,<br />cada historia."
           </blockquote>
         </div>
         <p className="text-xs text-zinc-600">RAW Manager &copy; {new Date().getFullYear()}</p>
@@ -44,7 +44,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-zinc-100">Bienvenido de nuevo</h2>
-            <p className="text-sm text-zinc-500 mt-1">Inicia sesion en tu cuenta</p>
+            <p className="text-sm text-zinc-500 mt-1">Inicia sesión en tu cuenta</p>
           </div>
 
           {error && (
@@ -55,7 +55,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="Correo electronico"
+              label="Correo electrónico"
               type="email"
               placeholder="tu@email.com"
               value={form.email}
@@ -63,7 +63,7 @@ export default function LoginPage() {
               required
             />
             <Input
-              label="Contrasena"
+              label="Contraseña"
               type="password"
               placeholder="••••••••"
               value={form.password}
@@ -71,14 +71,14 @@ export default function LoginPage() {
               required
             />
             <Button type="submit" className="w-full" loading={loading}>
-              Iniciar sesion
+              Iniciar sesión
             </Button>
           </form>
 
           <p className="text-center text-sm text-zinc-500 mt-6">
-            No tienes cuenta?{' '}
+            ¿No tienes cuenta?{' '}
             <Link to="/register" className="text-zinc-300 hover:text-white transition-colors">
-              Registrate
+              Regístrate
             </Link>
           </p>
 

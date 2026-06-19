@@ -55,8 +55,8 @@ export default function QuoteForm({ initial, sessions, onSuccess, onCancel }) {
     <form onSubmit={(e) => { e.preventDefault(); setErrors({}); mutation.mutate(form) }} className="space-y-6">
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2">
-          <Select label="Sesion *" value={form.photo_session_id} onChange={set('photo_session_id')} error={errors.photo_session_id} required>
-            <option value="">Seleccionar sesion...</option>
+          <Select label="Sesión *" value={form.photo_session_id} onChange={set('photo_session_id')} error={errors.photo_session_id} required>
+            <option value="">Seleccionar sesión...</option>
             {sessions.map((s) => (
               <option key={s.id} value={s.id}>{s.name} — {s.client?.name}</option>
             ))}

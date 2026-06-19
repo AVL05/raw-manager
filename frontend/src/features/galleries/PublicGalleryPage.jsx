@@ -1,23 +1,35 @@
 import { useParams } from 'react-router-dom'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
 import { galleriesApi } from '../../api/galleries'
 import Spinner from '../../components/ui/Spinner'
 
+const EMAIL_KEY = 'gallery_client_email'
+
 export default function PublicGalleryPage() {
   const { token } = useParams()
-  const [clientEmail, setClientEmail] = useState('')
-  const [emailSubmitted, setEmailSubmitted] = useState(false)
+  const qc = useQueryClient()
+  const [clientEmail, setClientEmail] = useState(() => localStorage.getItem(EMAIL_KEY))
+  const [emailInput, setEmailInput] = useState('')
   const [favorites, setFavorites] = useState(new Set())
 
   const { data: gallery, isLoading, error } = useQuery({
-    queryKey: ['public-gallery', token],
-    queryFn: () => galleriesApi.getPublic(token).then((r) => r.data),
+    queryKey: ['public-gallery', token, clientEmail],
+    queryFn: () => galleriesApi.getPublic(token, clientEmail || null).then((r) => r.data),
   })
 
+  // Inicializar favoritas desde la respuesta del servidor
+  useEffect(() => {
+    if (gallery?.images) {
+      const favIds = gallery.images
+        .filter((img) => img.is_favorite)
+        .map((img) => img.id)
+      setFavorites(new Set(favIds))
+    }
+  }, [gallery])
+
   const favMutation = useMutation({
-    mutationFn: (imageId) =>
-      galleriesApi.toggleFavorite(token, imageId, clientEmail),
+    mutationFn: (imageId) => galleriesApi.toggleFavorite(token, imageId, clientEmail),
     onSuccess: (res, imageId) => {
       setFavorites((prev) => {
         const next = new Set(prev)
@@ -27,6 +39,20 @@ export default function PublicGalleryPage() {
       })
     },
   })
+
+  const submitEmail = () => {
+    if (!emailInput) {
+      // Continuar sin email
+      setClientEmail('')
+      localStorage.removeItem(EMAIL_KEY)
+    } else {
+      setClientEmail(emailInput)
+      localStorage.setItem(EMAIL_KEY, emailInput)
+    }
+    qc.invalidateQueries({ queryKey: ['public-gallery', token] })
+  }
+
+  const emailSubmitted = clientEmail !== null
 
   if (isLoading) return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
@@ -38,8 +64,8 @@ export default function PublicGalleryPage() {
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
       <div className="text-center">
         <p className="text-4xl mb-4">🔒</p>
-        <h1 className="text-xl font-semibold text-zinc-200 mb-2">Galeria no disponible</h1>
-        <p className="text-sm text-zinc-500">Este enlace no es valido o ha expirado.</p>
+        <h1 className="text-xl font-semibold text-zinc-200 mb-2">Galería no disponible</h1>
+        <p className="text-sm text-zinc-500">Este enlace no es válido o ha expirado.</p>
       </div>
     </div>
   )
@@ -53,30 +79,43 @@ export default function PublicGalleryPage() {
           <p className="text-xs text-zinc-600 mt-2">{gallery.images?.length ?? 0} fotos</p>
         </div>
 
-        {!emailSubmitted ? (
+        {!emailSubmitted && (
           <div className="max-w-sm mx-auto bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-10">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-3">Identificate para marcar favoritas</h2>
+            <h2 className="text-sm font-semibold text-zinc-300 mb-3">Identifícate para marcar favoritas</h2>
             <p className="text-xs text-zinc-500 mb-4">Introduce tu email para guardar tus fotos favoritas (opcional)</p>
             <div className="flex gap-2">
               <input
                 type="email"
                 placeholder="tu@email.com"
-                value={clientEmail}
-                onChange={(e) => setClientEmail(e.target.value)}
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && submitEmail()}
                 className="flex-1 bg-zinc-800 border border-zinc-700 text-zinc-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/30"
               />
               <button
-                onClick={() => { if (clientEmail) setEmailSubmitted(true) }}
+                onClick={submitEmail}
                 className="bg-white text-zinc-900 px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-100 transition-colors"
               >
                 OK
               </button>
             </div>
-            <button onClick={() => setEmailSubmitted(true)} className="text-xs text-zinc-600 hover:text-zinc-400 mt-3 w-full">
+            <button onClick={submitEmail} className="text-xs text-zinc-600 hover:text-zinc-400 mt-3 w-full">
               Continuar sin identificarme
             </button>
           </div>
-        ) : null}
+        )}
+
+        {emailSubmitted && clientEmail && (
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <p className="text-xs text-zinc-500">Viendo como <span className="text-zinc-300">{clientEmail}</span></p>
+            <button
+              onClick={() => { setClientEmail(''); localStorage.removeItem(EMAIL_KEY) }}
+              className="text-xs text-zinc-600 hover:text-zinc-400 underline"
+            >
+              Cambiar
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {gallery.images?.map((img) => (
@@ -87,7 +126,7 @@ export default function PublicGalleryPage() {
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
-              {emailSubmitted && clientEmail && (
+              {clientEmail && (
                 <button
                   onClick={() => favMutation.mutate(img.id)}
                   className={'absolute top-2 right-2 p-1.5 rounded-full transition-all ' +
@@ -107,7 +146,7 @@ export default function PublicGalleryPage() {
         </div>
 
         <div className="text-center mt-12">
-          <p className="text-xs text-zinc-700">Galeria creada con RAW Manager</p>
+          <p className="text-xs text-zinc-700">Galería creada con RAW Manager</p>
         </div>
       </div>
     </div>

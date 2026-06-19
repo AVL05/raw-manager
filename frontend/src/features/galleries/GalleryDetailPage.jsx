@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRef } from 'react'
 import { galleriesApi } from '../../api/galleries'
+import { compressImage } from '../../utils/compressImage'
 import PageHeader from '../../components/shared/PageHeader'
 import Button from '../../components/ui/Button'
 import Spinner from '../../components/ui/Spinner'
@@ -32,7 +33,8 @@ export default function GalleryDetailPage() {
     if (!files.length) return
     setUploading(true)
     try {
-      await galleriesApi.uploadImages(id, files)
+      const compressed = await Promise.all(files.map(compressImage))
+      await galleriesApi.uploadImages(id, compressed)
       qc.invalidateQueries({ queryKey: ['gallery', id] })
     } finally {
       setUploading(false)
@@ -55,7 +57,7 @@ export default function GalleryDetailPage() {
           <div className="flex gap-2">
             <Button variant="secondary" size="sm" onClick={copyLink}>Copiar enlace cliente</Button>
             <Button onClick={() => fileInputRef.current.click()} loading={uploading}>
-              Subir imagenes
+              Subir imágenes
             </Button>
             <Button variant="secondary" onClick={() => navigate('/galleries')}>Volver</Button>
           </div>
@@ -82,11 +84,11 @@ export default function GalleryDetailPage() {
       {!gallery?.images?.length ? (
         <EmptyState
           icon="📸"
-          title="Sin imagenes todavia"
-          description="Sube las fotos de la sesion para compartirlas con el cliente"
+          title="Sin imágenes todavía"
+          description="Sube las fotos de la sesión para compartirlas con el cliente"
           action={
             <Button onClick={() => fileInputRef.current.click()} loading={uploading}>
-              Subir imagenes
+              Subir imágenes
             </Button>
           }
         />
@@ -114,7 +116,7 @@ export default function GalleryDetailPage() {
         onConfirm={() => deleteImgMutation.mutate(deletingImg.id)}
         loading={deleteImgMutation.isPending}
         title="Eliminar imagen"
-        message="Se eliminara esta imagen de la galeria."
+        message="Se eliminará esta imagen de la galería."
       />
     </div>
   )

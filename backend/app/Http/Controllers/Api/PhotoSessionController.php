@@ -57,29 +57,29 @@ class PhotoSessionController extends Controller
         return response()->json(new PhotoSessionResource($session->load('client')), 201);
     }
 
-    public function show(Request $request, PhotoSession $photoSession): JsonResponse
+    public function show(Request $request, PhotoSession $session): JsonResponse
     {
-        $this->authorize($request, $photoSession);
+        $this->authorize($request, $session);
 
         return response()->json(new PhotoSessionResource(
-            $photoSession->load(['client', 'quote.items', 'invoice', 'gallery.images'])
+            $session->load(['client', 'quote.items', 'invoice', 'gallery.images'])
         ));
     }
 
-    public function update(UpdateSessionRequest $request, PhotoSession $photoSession): JsonResponse
+    public function update(UpdateSessionRequest $request, PhotoSession $session): JsonResponse
     {
-        $this->authorize($request, $photoSession);
+        $this->authorize($request, $session);
 
-        $photoSession->update($request->validated());
+        $session->update($request->validated());
 
-        return response()->json(new PhotoSessionResource($photoSession->load('client')));
+        return response()->json(new PhotoSessionResource($session->load('client')));
     }
 
-    public function destroy(Request $request, PhotoSession $photoSession): JsonResponse
+    public function destroy(Request $request, PhotoSession $session): JsonResponse
     {
-        $this->authorize($request, $photoSession);
+        $this->authorize($request, $session);
 
-        $photoSession->delete();
+        $session->delete();
 
         return response()->json(null, 204);
     }

@@ -39,7 +39,21 @@ export default function SessionsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => sessionsApi.delete(id),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['sessions'] }); setDeleting(null) },
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['sessions', search, filterStatus] })
+      const prev = qc.getQueryData(['sessions', search, filterStatus])
+      qc.setQueryData(['sessions', search, filterStatus], (old) =>
+        old ? { ...old, data: { ...old.data, data: old.data.data.filter((s) => s.id !== id) } } : old
+      )
+      return { prev }
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['sessions', search, filterStatus], ctx.prev)
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['sessions'] })
+      setDeleting(null)
+    },
   })
 
   const handleClose = () => { setShowForm(false); setEditing(null) }
@@ -48,13 +62,13 @@ export default function SessionsPage() {
     <div>
       <PageHeader
         title="Sesiones"
-        description="Gestiona tus sesiones fotograficas"
-        action={<Button onClick={() => setShowForm(true)}>+ Nueva sesion</Button>}
+        description="Gestiona tus sesiones fotográficas"
+        action={<Button onClick={() => setShowForm(true)}>+ Nueva sesión</Button>}
       />
 
       <div className="flex flex-wrap gap-3 mb-6">
         <Input
-          placeholder="Buscar sesion o cliente..."
+          placeholder="Buscar sesión o cliente..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
@@ -75,15 +89,15 @@ export default function SessionsPage() {
         <EmptyState
           icon="📷"
           title="Sin sesiones"
-          description="Crea tu primera sesion fotografica"
-          action={<Button onClick={() => setShowForm(true)}>Crear sesion</Button>}
+          description="Crea tu primera sesión fotográfica"
+          action={<Button onClick={() => setShowForm(true)}>Crear sesión</Button>}
         />
       ) : (
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-800 text-zinc-500 text-xs uppercase tracking-wider">
-                <th className="text-left px-4 py-3">Sesion</th>
+                <th className="text-left px-4 py-3">Sesión</th>
                 <th className="text-left px-4 py-3">Cliente</th>
                 <th className="text-left px-4 py-3 hidden md:table-cell">Fecha</th>
                 <th className="text-left px-4 py-3 hidden lg:table-cell">Tipo</th>
@@ -122,7 +136,7 @@ export default function SessionsPage() {
         </div>
       )}
 
-      <Modal open={showForm} onClose={handleClose} title={editing ? 'Editar sesion' : 'Nueva sesion'} size="lg">
+      <Modal open={showForm} onClose={handleClose} title={editing ? 'Editar sesión' : 'Nueva sesión'} size="lg">
         <SessionForm
           clients={clients ?? []}
           initial={editing}
@@ -136,8 +150,8 @@ export default function SessionsPage() {
         onClose={() => setDeleting(null)}
         onConfirm={() => deleteMutation.mutate(deleting.id)}
         loading={deleteMutation.isPending}
-        title="Eliminar sesion"
-        message={'Eliminar sesion "' + (deleting?.name ?? '') + '"?'}
+        title="Eliminar sesión"
+        message={'¿Eliminar la sesión "' + (deleting?.name ?? '') + '"?'}
       />
     </div>
   )

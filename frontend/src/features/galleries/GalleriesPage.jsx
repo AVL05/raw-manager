@@ -31,17 +31,17 @@ function GalleryForm({ sessions, onSuccess, onCancel }) {
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); setErrors({}); mutation.mutate(form) }} className="space-y-4">
-      <Select label="Sesion *" value={form.photo_session_id} onChange={(e) => setForm({ ...form, photo_session_id: e.target.value })} error={errors.photo_session_id} required>
-        <option value="">Seleccionar sesion...</option>
+      <Select label="Sesión *" value={form.photo_session_id} onChange={(e) => setForm({ ...form, photo_session_id: e.target.value })} error={errors.photo_session_id} required>
+        <option value="">Seleccionar sesión...</option>
         {sessions.map((s) => (
           <option key={s.id} value={s.id}>{s.name} — {s.client?.name}</option>
         ))}
       </Select>
-      <Input label="Nombre de la galeria *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} error={errors.name} required placeholder="Ej: Boda Maria y Juan — Galeria completa" />
-      <Textarea label="Descripcion" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Mensaje para el cliente..." />
+      <Input label="Nombre de la galería *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} error={errors.name} required placeholder="Ej: Boda María y Juan — Galería completa" />
+      <Textarea label="Descripción" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Mensaje para el cliente..." />
       <div className="flex gap-3 justify-end">
         <Button variant="secondary" type="button" onClick={onCancel}>Cancelar</Button>
-        <Button type="submit" loading={mutation.isPending}>Crear galeria</Button>
+        <Button type="submit" loading={mutation.isPending}>Crear galería</Button>
       </div>
     </form>
   )
@@ -75,9 +75,9 @@ export default function GalleriesPage() {
   return (
     <div>
       <PageHeader
-        title="Galerias"
+        title="Galerías"
         description="Comparte tus trabajos con los clientes"
-        action={<Button onClick={() => setShowForm(true)}>+ Nueva galeria</Button>}
+        action={<Button onClick={() => setShowForm(true)}>+ Nueva galería</Button>}
       />
 
       {isLoading ? (
@@ -85,9 +85,9 @@ export default function GalleriesPage() {
       ) : !data?.data?.length ? (
         <EmptyState
           icon="🖼️"
-          title="Sin galerias"
-          description="Crea una galeria privada y comparte tus fotos con el cliente"
-          action={<Button onClick={() => setShowForm(true)}>Crear galeria</Button>}
+          title="Sin galerías"
+          description="Crea una galería privada y comparte tus fotos con el cliente"
+          action={<Button onClick={() => setShowForm(true)}>Crear galería</Button>}
         />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -105,11 +105,11 @@ export default function GalleriesPage() {
 
               {g.description && <p className="text-xs text-zinc-500 line-clamp-2">{g.description}</p>}
 
-              <p className="text-xs text-zinc-600">{g.images_count ?? 0} imagenes</p>
+              <p className="text-xs text-zinc-600">{g.images_count ?? 0} imágenes</p>
 
               <div className="flex flex-col gap-2 pt-2 border-t border-zinc-800">
                 <Button variant="secondary" size="sm" onClick={() => navigate('/galleries/' + g.id)}>
-                  Gestionar galeria
+                  Gestionar galería
                 </Button>
                 <Button
                   variant="ghost"
@@ -128,7 +128,7 @@ export default function GalleriesPage() {
         </div>
       )}
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nueva galeria">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nueva galería">
         <GalleryForm
           sessions={sessions ?? []}
           onSuccess={() => { qc.invalidateQueries({ queryKey: ['galleries'] }); setShowForm(false) }}
@@ -141,8 +141,8 @@ export default function GalleriesPage() {
         onClose={() => setDeleting(null)}
         onConfirm={() => deleteMutation.mutate(deleting.id)}
         loading={deleteMutation.isPending}
-        title="Eliminar galeria"
-        message={'Se eliminara la galeria "' + (deleting?.name ?? '') + '" y todas sus imagenes.'}
+        title="Eliminar galería"
+        message={'¿Eliminar la galería "' + (deleting?.name ?? '') + '" y todas sus imágenes?'}
       />
     </div>
   )

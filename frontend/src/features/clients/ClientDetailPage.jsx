@@ -42,7 +42,7 @@ export default function ClientDetailPage() {
           )}
           {client?.phone && (
             <div>
-              <p className="text-xs text-zinc-600">Telefono</p>
+              <p className="text-xs text-zinc-600">Teléfono</p>
               <p className="text-sm text-zinc-200">{client.phone}</p>
             </div>
           )}
@@ -78,7 +78,7 @@ export default function ClientDetailPage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-zinc-500 text-xs uppercase border-b border-zinc-800">
-                <th className="text-left px-4 py-3">Sesion</th>
+                <th className="text-left px-4 py-3">Sesión</th>
                 <th className="text-left px-4 py-3">Fecha</th>
                 <th className="text-left px-4 py-3">Estado</th>
                 <th className="text-right px-4 py-3">Precio</th>

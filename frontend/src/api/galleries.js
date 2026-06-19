@@ -12,7 +12,8 @@ export const galleriesApi = {
     return api.post(`/galleries/${id}/images`, form, { headers: { 'Content-Type': 'multipart/form-data' } })
   },
   deleteImage: (galleryId, imageId) => api.delete(`/galleries/${galleryId}/images/${imageId}`),
-  getPublic: (token) => api.get(`/public/gallery/${token}`),
+  getPublic: (token, clientEmail) =>
+    api.get(`/public/gallery/${token}`, { params: clientEmail ? { client_email: clientEmail } : {} }),
   toggleFavorite: (token, imageId, clientEmail) =>
     api.post(`/public/gallery/${token}/favorite/${imageId}`, { client_email: clientEmail }),
 }

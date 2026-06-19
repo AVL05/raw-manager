@@ -26,7 +26,18 @@ export default function ClientsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => clientsApi.delete(id),
-    onSuccess: () => {
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['clients', search] })
+      const prev = qc.getQueryData(['clients', search])
+      qc.setQueryData(['clients', search], (old) =>
+        old ? { ...old, data: { ...old.data, data: old.data.data.filter((c) => c.id !== id) } } : old
+      )
+      return { prev }
+    },
+    onError: (_err, _id, ctx) => {
+      if (ctx?.prev) qc.setQueryData(['clients', search], ctx.prev)
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['clients'] })
       setDeleting(null)
     },
@@ -55,8 +66,8 @@ export default function ClientsPage() {
       ) : !data?.data?.length ? (
         <EmptyState
           icon="👥"
-          title="Sin clientes todavia"
-          description="Anade tu primer cliente para empezar"
+          title="Sin clientes todavía"
+          description="Añade tu primer cliente para empezar"
           action={<Button onClick={() => setShowForm(true)}>Crear cliente</Button>}
         />
       ) : (
@@ -121,7 +132,7 @@ export default function ClientsPage() {
         onConfirm={() => deleteMutation.mutate(deleting.id)}
         loading={deleteMutation.isPending}
         title="Eliminar cliente"
-        message={'Eliminar a ' + (deleting?.name ?? '') + '? Esta accion no se puede deshacer.'}
+        message={'¿Eliminar a ' + (deleting?.name ?? '') + '? Esta acción no se puede deshacer.'}
       />
     </div>
   )

@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 
 class PublicGalleryController extends Controller
 {
-    public function show(string $token): JsonResponse
+    public function show(Request $request, string $token): JsonResponse
     {
         $gallery = Gallery::where('access_token', $token)
             ->with(['images', 'photoSession'])
@@ -22,6 +22,24 @@ class PublicGalleryController extends Controller
 
         if (!$gallery->isAccessible()) {
             return response()->json(['message' => 'Esta galería no está disponible.'], 403);
+        }
+
+        // Si se pasa client_email, marcamos is_favorite en cada imagen
+        if ($request->filled('client_email')) {
+            $client = Client::where('email', $request->client_email)
+                ->whereHas('photoSessions', fn($q) => $q->where('id', $gallery->photo_session_id))
+                ->first();
+
+            if ($client) {
+                $favoriteIds = GalleryImageFavorite::where('client_id', $client->id)
+                    ->whereIn('gallery_image_id', $gallery->images->pluck('id'))
+                    ->pluck('gallery_image_id')
+                    ->flip();
+
+                $gallery->images->each(function ($img) use ($favoriteIds) {
+                    $img->is_favorite = isset($favoriteIds[$img->id]);
+                });
+            }
         }
 
         return response()->json(new GalleryResource($gallery));

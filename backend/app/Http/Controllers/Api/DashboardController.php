@@ -20,6 +20,14 @@ class DashboardController extends Controller
     {
         $userId = $request->user()->id;
 
+        // Marcar facturas vencidas antes de calcular stats
+        Invoice::join('photo_sessions', 'invoices.photo_session_id', '=', 'photo_sessions.id')
+            ->where('photo_sessions.photographer_id', $userId)
+            ->where('invoices.status', InvoiceStatus::Pending->value)
+            ->whereNotNull('invoices.due_date')
+            ->where('invoices.due_date', '<', now()->toDateString())
+            ->update(['invoices.status' => InvoiceStatus::Overdue->value]);
+
         // Una sola query con JOIN para todas las métricas de facturas
         $invoiceStats = DB::table('invoices')
             ->join('photo_sessions', 'invoices.photo_session_id', '=', 'photo_sessions.id')

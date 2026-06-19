@@ -1,0 +1,10 @@
+{
+  "name": "raw-manager",
+  "private": true,
+  "scripts": {
+    "start": "npx concurrently --names \"back,front\" --prefix-colors \"blue,green\" \"cd backend && php artisan serve --host=127.0.0.1 --port=8000\" \"npm run dev --prefix frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

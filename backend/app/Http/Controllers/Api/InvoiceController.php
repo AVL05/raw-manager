@@ -19,6 +19,13 @@ class InvoiceController extends Controller
 
     public function index(Request $request): AnonymousResourceCollection
     {
+        // Marcar como vencidas las facturas pendientes cuyo plazo ha pasado
+        Invoice::whereHas('photoSession', fn($q) => $q->where('photographer_id', $request->user()->id))
+            ->where('status', InvoiceStatus::Pending->value)
+            ->whereNotNull('due_date')
+            ->where('due_date', '<', now()->toDateString())
+            ->update(['status' => InvoiceStatus::Overdue->value]);
+
         $invoices = Invoice::whereHas('photoSession', fn($q) => $q->where('photographer_id', $request->user()->id))
             ->with(['photoSession.client'])
             ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))

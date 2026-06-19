@@ -1,4 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
+
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 13) return 'Buenos días'
+  if (h < 21) return 'Buenas tardes'
+  return 'Buenas noches'
+}
 import { dashboardApi } from '../../api/dashboard'
 import { useAuthStore } from '../../store/authStore'
 import { formatCurrency, formatDate, SESSION_STATUS_COLORS, INVOICE_STATUS_COLORS, INVOICE_STATUS_LABELS, SESSION_STATUS_LABELS } from '../../utils/formatters'
@@ -37,8 +44,8 @@ export default function DashboardPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-zinc-100">Buenos dias, {user?.name?.split(' ')[0]}</h1>
-        <p className="text-sm text-zinc-500 mt-1">Aqui tienes el resumen de tu estudio</p>
+        <h1 className="text-2xl font-bold text-zinc-100">{greeting()}, {user?.name?.split(' ')[0]}</h1>
+        <p className="text-sm text-zinc-500 mt-1">Aquí tienes el resumen de tu estudio</p>
       </div>
 
       {loadingStats ? <Spinner /> : (
@@ -52,9 +59,9 @@ export default function DashboardPage() {
 
       <div className="grid lg:grid-cols-2 gap-6">
         <Card>
-          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Proximas sesiones</h2>
+          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Próximas sesiones</h2>
           {!upcoming?.data?.length ? (
-            <p className="text-sm text-zinc-600 py-4 text-center">No hay sesiones proximas</p>
+            <p className="text-sm text-zinc-600 py-4 text-center">No hay sesiones próximas</p>
           ) : (
             <div className="space-y-3">
               {upcoming.data.map((s) => (

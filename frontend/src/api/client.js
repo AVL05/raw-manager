@@ -3,7 +3,6 @@ import axios from 'axios'
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-  withCredentials: true,
 })
 
 api.interceptors.request.use((config) => {
@@ -15,7 +14,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const status = err.response?.status
+    const isForbiddenRole = err.response?.data?.error === 'forbidden_role'
+
+    if (status === 401 || (status === 403 && isForbiddenRole)) {
       localStorage.removeItem('token')
       localStorage.removeItem('auth-store')
       if (window.location.pathname !== '/login') {

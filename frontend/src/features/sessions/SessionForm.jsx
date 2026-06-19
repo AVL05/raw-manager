@@ -67,12 +67,12 @@ export default function SessionForm({ initial, clients, onSuccess, onCancel }) {
           </Select>
         </div>
         <div className="col-span-2">
-          <Input label="Nombre de la sesion *" value={form.name} onChange={set('name')} error={errors.name} required />
+          <Input label="Nombre de la sesión *" value={form.name} onChange={set('name')} error={errors.name} required />
         </div>
         <Input label="Fecha *" type="date" value={form.date} onChange={set('date')} error={errors.date} required />
         <Input label="Hora" type="time" value={form.time} onChange={set('time')} />
         <div className="col-span-2">
-          <Input label="Ubicacion" value={form.location} onChange={set('location')} placeholder="Lugar de la sesion..." />
+          <Input label="Ubicación" value={form.location} onChange={set('location')} placeholder="Lugar de la sesión..." />
         </div>
         <Select label="Tipo" value={form.type} onChange={set('type')}>
           {SESSION_TYPES.map((t) => (
@@ -88,13 +88,13 @@ export default function SessionForm({ initial, clients, onSuccess, onCancel }) {
           <Input label="Precio (EUR)" type="number" step="0.01" min="0" value={form.price} onChange={set('price')} placeholder="0.00" />
         </div>
         <div className="col-span-2">
-          <Textarea label="Notas internas" value={form.internal_notes} onChange={set('internal_notes')} placeholder="Notas que no vera el cliente..." rows={3} />
+          <Textarea label="Notas internas" value={form.internal_notes} onChange={set('internal_notes')} placeholder="Notas que no verá el cliente..." rows={3} />
         </div>
       </div>
       <div className="flex gap-3 justify-end pt-2">
         <Button variant="secondary" type="button" onClick={onCancel}>Cancelar</Button>
         <Button type="submit" loading={mutation.isPending}>
-          {initial ? 'Guardar cambios' : 'Crear sesion'}
+          {initial ? 'Guardar cambios' : 'Crear sesión'}
         </Button>
       </div>
     </form>

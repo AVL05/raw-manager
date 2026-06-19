@@ -6,10 +6,11 @@ use App\Enums\SessionStatus;
 use App\Enums\SessionType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PhotoSession extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'photographer_id', 'client_id', 'name', 'date', 'time',
