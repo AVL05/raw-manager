@@ -14,19 +14,22 @@ import QuoteDetailPage from '../features/quotes/QuoteDetailPage'
 import InvoicesPage from '../features/invoices/InvoicesPage'
 import GalleriesPage from '../features/galleries/GalleriesPage'
 import GalleryDetailPage from '../features/galleries/GalleryDetailPage'
-import PublicGalleryPage from '../features/galleries/PublicGalleryPage'
 import ProfilePage from '../features/profile/ProfilePage'
+import EquipmentPage from '../features/equipment/EquipmentPage'
+import PresetsPage from '../features/presets/PresetsPage'
+import LocationsPage from '../features/locations/LocationsPage'
+import MoodboardsPage from '../features/moodboards/MoodboardsPage'
+import PhotoLibraryPage from '../features/photoLibrary/PhotoLibraryPage'
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated, user } = useAuthStore()
+  const { isAuthenticated } = useAuthStore()
   if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (user?.role && user.role !== 'photographer') return <Navigate to="/login" replace />
   return children
 }
 
 function GuestRoute({ children }) {
-  const { isAuthenticated, user } = useAuthStore()
-  if (isAuthenticated && user?.role === 'photographer') return <Navigate to="/dashboard" replace />
+  const { isAuthenticated } = useAuthStore()
+  if (isAuthenticated) return <Navigate to="/dashboard" replace />
   return children
 }
 
@@ -40,25 +43,28 @@ export const router = createBrowserRouter([
     element: <GuestRoute><RegisterPage /></GuestRoute>,
   },
   {
-    path: '/gallery/:token',
-    element: <PublicGalleryPage />,
-  },
-  {
     path: '/',
     element: <ProtectedRoute><AppLayout /></ProtectedRoute>,
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
-      { path: 'dashboard', element: <DashboardPage /> },
-      { path: 'clients', element: <ClientsPage /> },
-      { path: 'clients/:id', element: <ClientDetailPage /> },
-      { path: 'sessions', element: <SessionsPage /> },
-      { path: 'sessions/:id', element: <SessionDetailPage /> },
-      { path: 'quotes', element: <QuotesPage /> },
-      { path: 'quotes/:id', element: <QuoteDetailPage /> },
-      { path: 'invoices', element: <InvoicesPage /> },
-      { path: 'galleries', element: <GalleriesPage /> },
-      { path: 'galleries/:id', element: <GalleryDetailPage /> },
-      { path: 'profile', element: <ProfilePage /> },
+      { index: true,              element: <Navigate to="/dashboard" replace /> },
+      { path: 'dashboard',        element: <DashboardPage /> },
+      { path: 'clients',          element: <ClientsPage /> },
+      { path: 'clients/:id',      element: <ClientDetailPage /> },
+      { path: 'sessions',         element: <SessionsPage /> },
+      { path: 'sessions/:id',     element: <SessionDetailPage /> },
+      { path: 'quotes',           element: <QuotesPage /> },
+      { path: 'quotes/:id',       element: <QuoteDetailPage /> },
+      { path: 'invoices',         element: <InvoicesPage /> },
+      { path: 'galleries',        element: <GalleriesPage /> },
+      { path: 'galleries/:id',    element: <GalleryDetailPage /> },
+      { path: 'profile',          element: <ProfilePage /> },
+      // Studio modules
+      { path: 'equipment',        element: <EquipmentPage /> },
+      { path: 'presets',          element: <PresetsPage /> },
+      { path: 'locations',        element: <LocationsPage /> },
+      { path: 'moodboards',       element: <MoodboardsPage /> },
+      { path: 'moodboards/:id',   element: <MoodboardsPage /> },
+      { path: 'photo-library',    element: <PhotoLibraryPage /> },
     ],
   },
   { path: '*', element: <Navigate to="/dashboard" replace /> },

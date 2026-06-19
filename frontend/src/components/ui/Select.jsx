@@ -1,9 +1,19 @@
 export default function Select({ label, error, children, className = '', ...props }) {
   return (
     <div className="flex flex-col gap-1.5">
-      {label && <label className="text-sm font-medium text-zinc-300">{label}</label>}
+      {label && (
+        <label className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wide">
+          {label}
+        </label>
+      )}
       <select
-        className={`w-full bg-zinc-800 border ${error ? 'border-red-500' : 'border-zinc-700'} text-zinc-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-zinc-500 transition-colors ${className}`}
+        className={`w-full rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] outline-none transition-all duration-150 cursor-pointer ${className}`}
+        style={{
+          background: 'var(--bg-elevated)',
+          border: `1px solid ${error ? 'var(--red)' : 'var(--border-default)'}`,
+        }}
+        onFocus={(e) => { e.target.style.borderColor = 'var(--accent)'; e.target.style.boxShadow = '0 0 0 3px var(--accent-subtle)' }}
+        onBlur={(e) => { e.target.style.borderColor = error ? 'var(--red)' : 'var(--border-default)'; e.target.style.boxShadow = 'none' }}
         {...props}
       >
         {children}

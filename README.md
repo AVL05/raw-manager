@@ -1,8 +1,8 @@
-# RAW Manager
+# RAW Manager — Photography OS
 
 **Plataforma de gestión integral para fotógrafos profesionales.**
 
-Gestiona clientes, sesiones fotográficas, presupuestos, facturas y galerías privadas desde un único panel. Diseñado para trabajar en solitario, sin complejidad de multi-tenant.
+Dashboard, clientes, sesiones, presupuestos, facturas, galerías, equipamiento, presets, localizaciones, moodboards y biblioteca fotográfica — todo desde un único panel de control oscuro, instalable como app en cualquier dispositivo.
 
 ---
 
@@ -12,26 +12,31 @@ Gestiona clientes, sesiones fotográficas, presupuestos, facturas y galerías pr
 - [Stack tecnológico](#stack-tecnológico)
 - [Puesta en marcha](#puesta-en-marcha)
 - [Credenciales demo](#credenciales-demo)
-- [Manual de usuario](#manual-de-usuario)
+- [Instalación como PWA](#instalación-como-pwa)
+- [Módulos](#módulos)
 - [Referencia de la API](#referencia-de-la-api)
 - [Arquitectura del proyecto](#arquitectura-del-proyecto)
-- [Desarrollo local](#desarrollo-local)
 - [Variables de entorno](#variables-de-entorno)
-- [CI/CD](#cicd)
-- [Licencia](#licencia)
 
 ---
 
 ## Características
 
-| Módulo | Funcionalidades |
+| Módulo | Descripción |
 |---|---|
-| **Dashboard** | Ingresos totales, por cobrar, sesiones activas, próximas citas, facturas recientes |
-| **Clientes** | CRUD completo, historial de sesiones por cliente |
-| **Sesiones** | Tipos (boda, retrato, evento…), estados, precio, localización, notas internas |
-| **Presupuestos** | Líneas de concepto, cálculo automático de IVA, cambio de estado, exportación PDF |
-| **Facturas** | Generadas desde presupuestos aprobados, numeración automática (FAC-YYYY-NNNN), marca de pagada, PDF |
-| **Galerías** | Subida de fotos, enlace privado por token UUID, favoritos del cliente |
+| **Dashboard** | Ingresos totales, por cobrar, sesiones activas, gráfico de evolución mensual, próximas citas y facturas recientes |
+| **Clientes** | CRUD completo con historial de sesiones por cliente |
+| **Sesiones** | Tipos (boda, retrato, evento, producto…), estados, precio, localización, notas internas |
+| **Presupuestos** | Líneas de concepto, cálculo de IVA en tiempo real, cambio de estado, exportación PDF |
+| **Facturas** | Numeración automática `FAC-YYYY-NNNN`, estados pagada/pendiente/vencida, PDF con sello |
+| **Galerías** | Subida de fotos, galería privada por sesión |
+| **Equipamiento** | Inventario de cámaras, objetivos, iluminación y accesorios agrupados por tipo |
+| **Presets** | Configuraciones de cámara por categoría (bodas, retrato, producto…) con parámetros técnicos |
+| **Localizaciones** | Fichas con coordenadas, datos meteorológicos en tiempo real y datos solares (amanecer, atardecer, hora dorada) |
+| **Moodboards** | Colecciones de referencias visuales organizadas por carpetas |
+| **Biblioteca** | Galería masonry con lightbox y subida drag-and-drop |
+| **Command Palette** | `Ctrl+K` para navegar, crear y buscar desde cualquier pantalla |
+| **PWA** | Instalable en Windows, Mac, iOS y Android sin tiendas de aplicaciones |
 
 ---
 
@@ -40,13 +45,15 @@ Gestiona clientes, sesiones fotográficas, presupuestos, facturas y galerías pr
 | Capa | Tecnología |
 |---|---|
 | Frontend | React 19 + Vite 8 + Tailwind CSS 4 |
-| Estado del cliente | Zustand (auth) + TanStack Query (server state) |
+| Animaciones | Framer Motion |
+| Iconos | Lucide React |
+| Gráficos | Recharts |
+| Estado del cliente | Zustand (auth + UI) + TanStack Query (server state) |
 | Backend | Laravel 13 + Sanctum |
 | Base de datos | MySQL/MariaDB |
-| Servidor local | Laravel (`php artisan serve`) |
-| Base de datos local | MySQL/MariaDB de XAMPP |
-| CI | GitHub Actions |
 | PDF | barryvdh/laravel-dompdf |
+| PWA | vite-plugin-pwa + Workbox |
+| Servidor local | XAMPP (MySQL) + `php artisan serve` |
 
 ---
 
@@ -57,13 +64,10 @@ Gestiona clientes, sesiones fotográficas, presupuestos, facturas y galerías pr
 - XAMPP con MySQL/MariaDB en el puerto 3306
 - PHP >= 8.3 y Composer
 - Node.js >= 20 y npm
-- Git
-
-PHP, Composer y Node se ejecutan directamente en el equipo.
 
 ### Instalación
 
-```bash
+```powershell
 # 1. Clona el repositorio
 git clone https://github.com/tu-usuario/raw-manager.git
 cd raw-manager
@@ -71,22 +75,16 @@ cd raw-manager
 # 2. Crea la base de datos en XAMPP
 C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE IF NOT EXISTS raw_manager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 3. Instala y configura el backend
+# 3. Configura el backend
 cd backend
 Copy-Item .env.example .env
 composer install
-
-# 4. Genera la clave de aplicación
 php artisan key:generate
-
-# 5. Ejecuta las migraciones y carga datos de demo
 php artisan migrate --seed
-
-# 6. Crea el enlace simbólico de storage
 php artisan storage:link
 php artisan serve --host=127.0.0.1 --port=8000
 
-# En otra terminal
+# 4. En otra terminal, inicia el frontend
 cd frontend
 npm install
 npm run dev
@@ -96,182 +94,114 @@ npm run dev
 
 | Servicio | URL |
 |---|---|
-| Frontend (app) | http://localhost:5173 |
+| App | http://localhost:5173 |
 | API | http://127.0.0.1:8000/api |
-| Base de datos | 127.0.0.1:3306 (usuario: `root`, sin contraseña por defecto) |
+| Base de datos | 127.0.0.1:3306 (usuario: `root`, sin contraseña) |
 
 ---
 
 ## Credenciales demo
 
-El seeder crea datos de ejemplo listos para explorar.
+El seeder carga datos realistas de un estudio de fotografía madrileño.
 
-| Rol | Email | Contraseña |
-|---|---|---|
-| Fotógrafo | `photographer@demo.com` | `password` |
-| Cliente | `client@demo.com` | `password` |
+| Email | Contraseña |
+|---|---|
+| `photographer@demo.com` | `password` |
 
-El fotógrafo demo tiene 5 clientes, 5 sesiones, 2 presupuestos, 2 facturas y 1 galería preconfiguradas.
+Incluye: **10 clientes**, **10 sesiones** (pasadas y futuras), **7 presupuestos**, **5 facturas** (pagadas, pendientes y vencida), **3 galerías**, **14 equipos** (Sony, Godox, Profoto, DJI…), **8 presets**, **8 localizaciones** españolas y **6 moodboards**.
+
+---
+
+## Instalación como PWA
+
+La app es una Progressive Web App instalable sin tiendas de aplicaciones.
+
+**Chrome / Edge (Windows y Mac):**
+Aparece un icono de instalación en la barra de direcciones. La propia app muestra un banner «Instalar» en la parte inferior la primera vez.
+
+**Android:**
+Chrome muestra automáticamente el banner de instalación.
+
+**iOS / Safari:**
+Botón compartir → «Añadir a pantalla de inicio».
+
+Una vez instalada, la app abre con icono propio, sin barra del navegador.
+
+### Acceso desde móvil en la misma red WiFi
+
+```powershell
+# Averigua la IP local del ordenador
+ipconfig | findstr "IPv4"
+
+# Accede desde el móvil:  http://192.168.1.XX:5173
+```
 
 ---
 
-## Manual de usuario
-
-### Primeros pasos
-
-1. Abre **http://localhost:5173** en tu navegador.
-2. Entra con tus credenciales o usa las de demo.
-3. El panel de inicio muestra un resumen de tu actividad.
-
----
+## Módulos
 
 ### Dashboard
 
-El dashboard es la primera pantalla tras el login. Muestra cuatro métricas clave:
-
-- **Ingresos totales** — suma de todas las facturas en estado *pagada*.
-- **Por cobrar** — suma de facturas *pendientes*.
-- **Sesiones pendientes** — sesiones que aún no están completadas o canceladas.
-- **Clientes activos** — clientes con alguna sesión asociada.
-
-Debajo verás dos paneles:
-- **Próximas sesiones** — las siguientes citas ordenadas por fecha.
-- **Facturas recientes** — las últimas facturas emitidas con su estado.
-
----
+Métricas en tiempo real: ingresos cobrados, importe pendiente, sesiones activas y clientes. Gráfico de área con la evolución mensual de ingresos. Alerta de facturas vencidas. Lista de próximas sesiones y facturas recientes con estado.
 
 ### Clientes
 
-**Listar clientes**
-Accede a *Clientes* en el menú lateral. Verás una tabla con nombre, email, ciudad y número de sesiones. Usa el buscador para filtrar por nombre o email.
-
-**Crear un cliente**
-Pulsa *+ Nuevo cliente* y rellena el formulario:
-- Nombre y email son obligatorios.
-- Teléfono, dirección, ciudad, código postal y NIF son opcionales pero recomendados para las facturas.
-- El campo *Notas* es privado (solo lo ves tú).
-
-**Editar o eliminar**
-Usa los botones de acción en cada fila. Eliminar un cliente eliminará también sus sesiones asociadas.
-
-**Historial de sesiones**
-Haz clic en el nombre del cliente para ver su ficha detallada con todas las sesiones, presupuestos y facturas relacionadas.
-
----
+CRUD completo. Campos: nombre, email, teléfono, dirección, ciudad, código postal, NIF y notas privadas. Ficha de cliente con historial de sesiones asociadas.
 
 ### Sesiones fotográficas
 
-**Crear una sesión**
-Ve a *Sesiones* → *+ Nueva sesión*. Campos:
-- **Cliente** — obligatorio. Selecciona de tu lista de clientes.
-- **Nombre** — descripción breve (ej. "Boda María y Juan").
-- **Fecha y hora** — cuándo se realiza.
-- **Tipo** — Boda, Retrato, Evento, Producto, Inmobiliaria, Otro.
-- **Localización** — lugar de la sesión.
-- **Precio** — importe acordado con el cliente.
-- **Notas internas** — visibles solo para ti.
+**Tipos:** Boda, Retrato, Evento, Producto, Inmobiliaria, Otro.
 
-**Estados de una sesión**
+**Estados:**
 
-| Estado | Significado |
+| Estado | Descripción |
 |---|---|
-| `Pendiente` | Sesión confirmada pero no realizada |
-| `En progreso` | Sesión en curso |
-| `Editando` | Post-producción activa |
-| `Entregada` | Fotos entregadas al cliente |
-| `Completada` | Proceso cerrado |
-| `Cancelada` | Sesión cancelada |
-
-Cambia el estado desde la ficha de detalle con los botones de avance rápido.
-
-**Ficha de sesión**
-Accede al detalle para ver toda la información, incluyendo el presupuesto y la factura asociados.
-
----
+| Pendiente | Confirmada, aún no realizada |
+| Confirmada | Detalles acordados con el cliente |
+| En progreso | Sesión en curso |
+| Finalizada | Realizada, en postproducción |
+| Entregada | Material enviado al cliente |
+| Cancelada | Sesión cancelada |
 
 ### Presupuestos
 
-**Crear un presupuesto**
-Ve a *Presupuestos* → *+ Nuevo presupuesto*. El formulario tiene dos partes:
-
-1. **Cabecera**: sesión asociada, tipo de IVA (%), fecha de validez y notas.
-2. **Líneas de concepto**: añade tantos conceptos como necesites. Cada línea tiene descripción, cantidad y precio unitario. El subtotal se calcula automáticamente.
-
-El total final (base + IVA) se actualiza en tiempo real mientras editas.
-
-**Estados del presupuesto**
-
-| Estado | Significado |
-|---|---|
-| `Borrador` | En preparación, no enviado |
-| `Enviado` | Enviado al cliente para revisión |
-| `Aprobado` | Cliente ha aceptado — permite generar factura |
-| `Rechazado` | Cliente ha rechazado la propuesta |
-
-Cambia el estado desde la barra lateral de la ficha de detalle.
-
-**Exportar PDF**
-Pulsa *Exportar PDF* en la ficha del presupuesto. Se descarga un documento profesional con los datos de tu estudio, los del cliente y el desglose de conceptos.
-
----
+Líneas de concepto con cantidad y precio unitario. IVA configurable por presupuesto. Flujo de estados: Borrador → Enviado → Aprobado / Rechazado. Exportación a PDF con datos del estudio y del cliente.
 
 ### Facturas
 
-**Crear una factura**
-Las facturas se generan siempre desde un presupuesto *aprobado*. Ve a *Facturas* → *+ Nueva factura*, selecciona el presupuesto y establece una fecha de vencimiento opcional.
+Generadas desde presupuestos aprobados. Numeración automática. Estados: Pendiente / Pagada / Vencida. PDF con sello «PAGADA» cuando corresponde.
 
-La numeración es automática con el formato `FAC-YYYY-NNNN` (ej. `FAC-2026-0001`).
+### Galerías
 
-**Estados de la factura**
+Subida múltiple de imágenes por sesión. Galería privada accesible desde la ficha de sesión.
 
-| Estado | Significado |
-|---|---|
-| `Pendiente` | Emitida, a la espera de pago |
-| `Pagada` | Pago recibido — registra la fecha de cobro |
-| `Vencida` | Superada la fecha de vencimiento sin pago |
+### Equipamiento
 
-Para marcar una factura como pagada, pulsa *Marcar pagada* en la fila de la tabla.
+Inventario agrupado por tipo: cámara, objetivo, iluminación, trípode, bolsa, accesorio. Campos: nombre, marca, modelo, número de serie, fecha y precio de compra, estado de conservación y notas.
 
-**Exportar PDF**
-Pulsa *PDF* en la fila correspondiente. Las facturas pagadas incluyen un sello visual **PAGADA**.
+### Presets
 
----
+Configuraciones técnicas de cámara organizadas por categoría. Parámetros: ISO, apertura, velocidad de obturación, balance de blancos y compensación de exposición. Botón de copia al portapapeles en cada parámetro.
 
-### Galerías privadas
+### Localizaciones
 
-Las galerías permiten compartir las fotos entregadas con el cliente mediante un enlace privado único. No requieren que el cliente tenga cuenta.
+Fichas con nombre, categoría, coordenadas GPS y descripción. Widget de clima en tiempo real mediante [Open-Meteo](https://open-meteo.com) (sin API key). Datos solares (amanecer, atardecer, duración del día) mediante [Sunrise-Sunset API](https://sunrise-sunset.org/api). Enlace directo a Google Maps.
 
-**Crear una galería**
-Ve a *Galerías* → *+ Nueva galería*. Selecciona la sesión asociada, dale un nombre y una descripción opcional para el cliente.
+### Moodboards
 
-**Subir fotos**
-Accede al detalle de la galería y pulsa *Subir imágenes*. Soporta JPG, PNG y WebP. Puedes seleccionar múltiples archivos a la vez.
+Colecciones de referencias visuales agrupadas por carpetas. Útil para briefings con clientes y preparación de sesiones.
 
-**Enlace privado del cliente**
-En la ficha de galería verás la URL privada. Pulsa *Copiar enlace cliente* y envíaselo por email, WhatsApp o como prefieras.
+### Biblioteca fotográfica
 
-**Qué ve el cliente**
-El cliente accede a la galería sin necesidad de contraseña. Puede introducir su email para marcar fotos como favoritas (útil para selección de fotos). Las favoritas quedan guardadas asociadas a su email.
-
-**Eliminar imágenes**
-En el grid de imágenes, pasa el ratón sobre una foto y pulsa *Eliminar* para borrarla de la galería y del servidor.
-
----
-
-### Perfil de fotógrafo
-
-Accede a tu perfil para configurar:
-- Nombre, email y teléfono.
-- **Datos del estudio**: nombre comercial, NIF/CIF, dirección completa — estos datos aparecen en todos los PDFs.
-- Bio, web e Instagram.
+Grid masonry con lightbox (navegación con flechas). Subida drag-and-drop o selector de archivos. Soporte JPG, PNG y WebP.
 
 ---
 
 ## Referencia de la API
 
-Base URL directa: `http://127.0.0.1:8000/api`
+Base URL: `http://127.0.0.1:8000/api`
 
-Todos los endpoints protegidos requieren el header:
+Todos los endpoints protegidos requieren:
 ```
 Authorization: Bearer {token}
 ```
@@ -280,10 +210,9 @@ Authorization: Bearer {token}
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| `POST` | `/auth/register` | Registrar fotógrafo |
 | `POST` | `/auth/login` | Iniciar sesión |
 | `POST` | `/auth/logout` | Cerrar sesión |
-| `GET` | `/auth/me` | Datos del usuario autenticado |
+| `GET` | `/auth/me` | Usuario autenticado |
 | `PUT` | `/auth/profile` | Actualizar perfil |
 
 ### Clientes
@@ -292,7 +221,7 @@ Authorization: Bearer {token}
 |---|---|---|
 | `GET` | `/clients` | Listar (query: `search`, `per_page`) |
 | `POST` | `/clients` | Crear |
-| `GET` | `/clients/{id}` | Ver detalle |
+| `GET` | `/clients/{id}` | Detalle |
 | `PUT` | `/clients/{id}` | Actualizar |
 | `DELETE` | `/clients/{id}` | Eliminar |
 | `GET` | `/clients/{id}/sessions` | Sesiones del cliente |
@@ -303,7 +232,7 @@ Authorization: Bearer {token}
 |---|---|---|
 | `GET` | `/sessions` | Listar (query: `search`, `status`, `type`, `client_id`) |
 | `POST` | `/sessions` | Crear |
-| `GET` | `/sessions/{id}` | Ver detalle |
+| `GET` | `/sessions/{id}` | Detalle |
 | `PUT` | `/sessions/{id}` | Actualizar |
 | `DELETE` | `/sessions/{id}` | Eliminar |
 | `PATCH` | `/sessions/{id}/status` | Cambiar estado |
@@ -314,7 +243,7 @@ Authorization: Bearer {token}
 |---|---|---|
 | `GET` | `/quotes` | Listar (query: `status`) |
 | `POST` | `/quotes` | Crear con líneas de concepto |
-| `GET` | `/quotes/{id}` | Ver detalle |
+| `GET` | `/quotes/{id}` | Detalle |
 | `PUT` | `/quotes/{id}` | Actualizar |
 | `DELETE` | `/quotes/{id}` | Eliminar |
 | `PATCH` | `/quotes/{id}/status` | Cambiar estado |
@@ -326,7 +255,7 @@ Authorization: Bearer {token}
 |---|---|---|
 | `GET` | `/invoices` | Listar (query: `status`) |
 | `POST` | `/invoices` | Crear desde presupuesto aprobado |
-| `GET` | `/invoices/{id}` | Ver detalle |
+| `GET` | `/invoices/{id}` | Detalle |
 | `PATCH` | `/invoices/{id}/status` | Cambiar estado |
 | `GET` | `/invoices/{id}/pdf` | Descargar PDF |
 
@@ -336,18 +265,63 @@ Authorization: Bearer {token}
 |---|---|---|
 | `GET` | `/galleries` | Listar |
 | `POST` | `/galleries` | Crear |
-| `GET` | `/galleries/{id}` | Ver detalle con imágenes |
+| `GET` | `/galleries/{id}` | Detalle con imágenes |
 | `PUT` | `/galleries/{id}` | Actualizar |
-| `DELETE` | `/galleries/{id}` | Eliminar galería e imágenes |
-| `POST` | `/galleries/{id}/images` | Subir imágenes (`multipart/form-data`, campo `images[]`) |
+| `DELETE` | `/galleries/{id}` | Eliminar |
+| `POST` | `/galleries/{id}/images` | Subir imágenes (`images[]`) |
 | `DELETE` | `/galleries/{id}/images/{imgId}` | Eliminar imagen |
 
-### Galería pública (sin autenticación)
+### Equipamiento
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| `GET` | `/public/gallery/{token}` | Ver galería por token UUID |
-| `POST` | `/public/gallery/{token}/favorite/{imageId}` | Marcar/desmarcar favorita (body: `client_email`) |
+| `GET` | `/equipment` | Listar |
+| `POST` | `/equipment` | Crear |
+| `GET` | `/equipment/{id}` | Detalle |
+| `PUT` | `/equipment/{id}` | Actualizar |
+| `DELETE` | `/equipment/{id}` | Eliminar |
+
+### Presets
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/presets` | Listar |
+| `POST` | `/presets` | Crear |
+| `GET` | `/presets/{id}` | Detalle |
+| `PUT` | `/presets/{id}` | Actualizar |
+| `DELETE` | `/presets/{id}` | Eliminar |
+
+### Localizaciones
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/locations` | Listar |
+| `POST` | `/locations` | Crear |
+| `GET` | `/locations/{id}` | Detalle |
+| `PUT` | `/locations/{id}` | Actualizar |
+| `DELETE` | `/locations/{id}` | Eliminar |
+| `POST` | `/locations/{id}/photos` | Subir fotos de localización |
+| `DELETE` | `/locations/{id}/photos/{photoId}` | Eliminar foto |
+
+### Moodboards
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/moodboards` | Listar |
+| `POST` | `/moodboards` | Crear |
+| `GET` | `/moodboards/{id}` | Detalle con items |
+| `PUT` | `/moodboards/{id}` | Actualizar |
+| `DELETE` | `/moodboards/{id}` | Eliminar |
+| `POST` | `/moodboards/{id}/items` | Añadir item |
+| `DELETE` | `/moodboards/{id}/items/{itemId}` | Eliminar item |
+
+### Biblioteca fotográfica
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/photo-library` | Listar |
+| `POST` | `/photo-library/upload` | Subir fotos (multipart) |
+| `DELETE` | `/photo-library/{id}` | Eliminar |
 
 ### Dashboard
 
@@ -363,104 +337,88 @@ Authorization: Bearer {token}
 
 ```
 raw-manager/
-├── backend/                    # Laravel 11
+├── backend/                        # Laravel 13
 │   ├── app/
-│   │   ├── Enums/              # SessionType, SessionStatus, QuoteStatus, InvoiceStatus, UserRole
+│   │   ├── Enums/                  # SessionType, SessionStatus, QuoteStatus,
+│   │   │                           # InvoiceStatus, UserRole
 │   │   ├── Http/
-│   │   │   ├── Controllers/Api/
-│   │   │   ├── Requests/       # Validación por dominio
-│   │   │   └── Resources/      # Transformadores de respuesta JSON
-│   │   ├── Models/             # Eloquent models
-│   │   └── Services/           # QuoteService, InvoiceService, GalleryService
+│   │   │   ├── Controllers/Api/    # Un controller por dominio
+│   │   │   ├── Requests/           # Validación de formularios
+│   │   │   └── Resources/          # Transformadores de respuesta JSON
+│   │   ├── Models/                 # Eloquent models
+│   │   └── Services/               # QuoteService, InvoiceService, GalleryService
 │   ├── database/
-│   │   ├── migrations/         # 14 migraciones ordenadas
-│   │   └── seeders/            # Datos de demo
-│   ├── resources/views/pdf/    # Plantillas Blade para PDFs
+│   │   ├── migrations/             # 22 migraciones ordenadas por timestamp
+│   │   └── seeders/                # DatabaseSeeder con datos realistas
+│   ├── resources/views/pdf/        # Plantillas Blade para PDFs
 │   └── routes/api.php
 │
-├── frontend/                   # React 18 + Vite
+├── frontend/                       # React 19 + Vite 8
+│   ├── public/                     # favicon.svg + iconos PWA generados
 │   └── src/
-│       ├── api/                # Clientes HTTP por dominio
+│       ├── api/                    # Clientes HTTP por dominio
 │       ├── components/
-│       │   ├── shared/         # Layout, Sidebar, PageHeader
-│       │   └── ui/             # Button, Input, Modal, Badge…
-│       ├── features/           # Módulos por dominio
+│       │   ├── shared/             # AppLayout, Sidebar, PageHeader
+│       │   └── ui/                 # Button, Input, Modal, Badge,
+│       │                           # CommandPalette, InstallBanner…
+│       ├── features/               # Páginas por módulo
 │       │   ├── auth/
 │       │   ├── dashboard/
 │       │   ├── clients/
 │       │   ├── sessions/
 │       │   ├── quotes/
 │       │   ├── invoices/
-│       │   └── galleries/
-│       ├── router/             # React Router v6 + rutas protegidas
-│       ├── store/              # Zustand (auth)
-│       └── utils/              # Formatters, labels, colores de estado
+│       │   ├── galleries/
+│       │   ├── equipment/
+│       │   ├── presets/
+│       │   ├── locations/
+│       │   ├── moodboards/
+│       │   └── photoLibrary/
+│       ├── router/                 # React Router v7 + guards de autenticación
+│       ├── store/                  # Zustand: authStore, uiStore
+│       └── index.css               # Design tokens (CSS custom properties)
 │
-└── .github/workflows/ci.yml   # Tests backend + build frontend
+└── CLAUDE.md                       # Guía para Claude Code
 ```
 
 ### Modelo de datos
 
 ```
-users ─────────────────────────────────── photographer_profiles
+users ──────────────────── photographer_profiles
   │
   ├── clients
-  │     └── photo_sessions ──────────────── quotes
-  │                                            └── quote_items
-  │                         └────────────── invoices
-  │                         └────────────── galleries
-  │                                            ├── gallery_images
-  │                                            │     └── gallery_image_favorites ── clients
-  │                                            └── (access_token UUID público)
+  │     └── photo_sessions ────── quotes ── quote_items
+  │                         ────── invoices
+  │                         ────── galleries ── gallery_images
+  │
+  ├── equipment
+  ├── presets
+  ├── locations ────── location_photos
+  ├── moodboards ───── moodboard_items
+  └── photo_library
 ```
 
-### Decisiones de arquitectura
+### Decisiones de diseño
 
 | Decisión | Motivo |
 |---|---|
-| Sin multi-tenant | Un fotógrafo por instancia; `photographer_id` en cada tabla simplifica consultas |
-| Sin Repository Pattern | Capa de abstracción innecesaria para un proyecto de este tamaño |
-| UUID en galería pública | Más seguro que IDs secuenciales; sin JWT que gestionar en el cliente |
-| Sanctum (token) | Más sencillo que JWT para SPAs internas; revocación inmediata |
-| PHP Enums | Tipo seguro para estados; el IDE y la base de datos están siempre alineados |
-
----
-
-## Desarrollo local
-
-La aplicación está preparada para ejecutarse directamente en Windows con
-MySQL/MariaDB de XAMPP.
-
-### Backend
-
-```bash
-cd backend
-composer install
-Copy-Item .env.example .env
-php artisan key:generate
-php artisan migrate --seed
-php artisan storage:link
-php artisan serve --host=127.0.0.1 --port=8000
-```
-
-### Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev                # http://localhost:5173
-```
+| Un único rol (`photographer`) | App personal; sin portal de clientes ni acceso externo |
+| Autorización inline en controllers | Sin capa de Policies; suficiente para un solo usuario |
+| Sanctum (token) | Más simple que JWT; revocación inmediata |
+| PHP Enums para estados | Tipo seguro; el IDE y la BD siempre alineados |
+| CSS custom properties | Design system coherente sin romper Tailwind Cascade Layers |
+| PWA con `generateSW` | Workbox maneja el Service Worker automáticamente |
 
 ---
 
 ## Variables de entorno
 
-Las principales variables de `backend/.env`:
+Variables principales en `backend/.env`:
 
 ```env
 APP_NAME="RAW Manager"
 APP_ENV=local
-APP_KEY=                        # Generada con artisan key:generate
+APP_KEY=                        # php artisan key:generate
 APP_URL=http://127.0.0.1:8000
 
 DB_HOST=127.0.0.1
@@ -474,24 +432,6 @@ FRONTEND_URL=http://localhost:5173
 
 FILESYSTEM_DISK=local
 ```
-
----
-
-## CI/CD
-
-GitHub Actions ejecuta dos jobs en cada push:
-
-**Backend** (`.github/workflows/ci.yml`):
-- PHP 8.2 + extensiones
-- MySQL 8 como servicio
-- `composer install`
-- `php artisan migrate`
-- `php artisan test`
-
-**Frontend**:
-- Node 20
-- `npm ci`
-- `npm run build`
 
 ---
 

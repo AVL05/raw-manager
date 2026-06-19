@@ -27,20 +27,6 @@ class User extends Authenticatable
         ];
     }
 
-    public function isPhotographer(): bool
-    {
-        $role = $this->role;
-        if ($role instanceof UserRole) {
-            return $role === UserRole::Photographer;
-        }
-        return $role === UserRole::Photographer->value;
-    }
-
-    public function isClient(): bool
-    {
-        return $this->role === UserRole::Client;
-    }
-
     public function photographerProfile()
     {
         return $this->hasOne(PhotographerProfile::class);

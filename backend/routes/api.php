@@ -3,10 +3,14 @@
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\EquipmentController;
 use App\Http\Controllers\Api\GalleryController;
 use App\Http\Controllers\Api\InvoiceController;
+use App\Http\Controllers\Api\LocationController;
+use App\Http\Controllers\Api\MoodboardController;
+use App\Http\Controllers\Api\PhotoLibraryController;
 use App\Http\Controllers\Api\PhotoSessionController;
-use App\Http\Controllers\Api\PublicGalleryController;
+use App\Http\Controllers\Api\PresetController;
 use App\Http\Controllers\Api\QuoteController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,12 +18,6 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-});
-
-// Public gallery (token-based, no auth)
-Route::prefix('public/gallery')->group(function () {
-    Route::get('{token}', [PublicGalleryController::class, 'show']);
-    Route::post('{token}/favorite/{image}', [PublicGalleryController::class, 'toggleFavorite']);
 });
 
 // Protected routes — cualquier usuario autenticado
@@ -64,4 +62,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('galleries', GalleryController::class);
     Route::post('galleries/{gallery}/images', [GalleryController::class, 'uploadImages']);
     Route::delete('galleries/{gallery}/images/{image}', [GalleryController::class, 'destroyImage']);
+
+    // Studio modules
+    Route::apiResource('equipment', EquipmentController::class);
+    Route::apiResource('presets', PresetController::class);
+    Route::apiResource('locations', LocationController::class);
+    Route::post('locations/{location}/photos', [LocationController::class, 'uploadPhoto']);
+    Route::delete('locations/{location}/photos/{photo}', [LocationController::class, 'destroyPhoto']);
+    Route::apiResource('moodboards', MoodboardController::class);
+    Route::post('moodboards/{moodboard}/items', [MoodboardController::class, 'addItem']);
+    Route::delete('moodboards/{moodboard}/items/{item}', [MoodboardController::class, 'removeItem']);
+    Route::apiResource('photo-library', PhotoLibraryController::class);
+    Route::post('photo-library/upload', [PhotoLibraryController::class, 'upload']);
 });
