@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Preset extends Model
 {
     protected $fillable = [
-        'photographer_id', 'name', 'category', 'iso', 'aperture',
+        'photographer_id', 'equipment_id', 'name', 'category', 'iso', 'aperture',
         'shutter_speed', 'white_balance', 'exposure_compensation', 'notes',
     ];
 
@@ -19,5 +19,10 @@ class Preset extends Model
     public function photographer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'photographer_id');
+    }
+
+    public function equipment(): BelongsTo
+    {
+        return $this->belongsTo(Equipment::class);
     }
 }

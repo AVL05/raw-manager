@@ -488,20 +488,24 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Mochila Think Tank PhotoCross 20', 'brand' => 'Think Tank', 'model' => 'PhotoCross 20', 'type' => 'bag', 'purchase_date' => '2022-01-15', 'purchase_price' => 179.00, 'condition' => 'good'],
         ];
 
+        $equipment = [];
         foreach ($equipmentData as $eq) {
-            Equipment::create(array_merge($eq, ['photographer_id' => $photographer->id, 'is_active' => true]));
+            $equipment[] = Equipment::create(array_merge($eq, ['photographer_id' => $photographer->id, 'is_active' => true]));
         }
+        // $equipment[0] = Sony A7 IV (principal), $equipment[1] = Sony A7 III (backup)
+        $cam1 = $equipment[0]->id; // Sony A7 IV
+        $cam2 = $equipment[1]->id; // Sony A7 III
 
         // ── Presets ───────────────────────────────────────────────────────
         $presetsData = [
-            ['name' => 'Golden Hour Bodas', 'category' => 'Bodas', 'iso' => '400', 'aperture' => '1.8', 'shutter_speed' => '1/200', 'white_balance' => '5600K', 'exposure_compensation' => 0, 'notes' => 'Perfecto para exteriores al atardecer. Añade calidez natural a los tonos piel.'],
-            ['name' => 'Ceremonia Interior', 'category' => 'Bodas', 'iso' => '3200', 'aperture' => '1.4', 'shutter_speed' => '1/100', 'white_balance' => '3800K', 'exposure_compensation' => 1, 'notes' => 'Para iglesias y salones con poca luz. Cuidado con el ruido en sombras.'],
-            ['name' => 'Retrato Natural Exterior', 'category' => 'Retrato', 'iso' => '200', 'aperture' => '2.0', 'shutter_speed' => '1/500', 'white_balance' => 'Auto', 'exposure_compensation' => 0, 'notes' => 'Luz de día nublado. Difusor natural. Ideal para retratos suaves.'],
-            ['name' => 'Retrato Estudio Blanco', 'category' => 'Retrato', 'iso' => '100', 'aperture' => '8.0', 'shutter_speed' => '1/160', 'white_balance' => '5500K', 'exposure_compensation' => 0, 'notes' => 'Fondo blanco con Profoto. Setup 3 puntos de luz.'],
-            ['name' => 'BN Dramático Evento', 'category' => 'Evento', 'iso' => '1600', 'aperture' => '2.8', 'shutter_speed' => '1/250', 'white_balance' => 'Auto', 'exposure_compensation' => -1, 'notes' => 'Blanco y negro en postpro. Alto contraste. Muy impactante para discursos.'],
-            ['name' => 'Producto Mesa Luz', 'category' => 'Producto', 'iso' => '100', 'aperture' => '11.0', 'shutter_speed' => '1/125', 'white_balance' => '5000K', 'exposure_compensation' => 0, 'notes' => 'Mesa de luz LED + rebotador. Objetos pequeños. Máxima nitidez.'],
-            ['name' => 'Food Editorial', 'category' => 'Gastronomía', 'iso' => '200', 'aperture' => '3.2', 'shutter_speed' => '1/200', 'white_balance' => '5200K', 'exposure_compensation' => 1, 'notes' => 'Luz ventana lateral + reflector. Bokeh suave en fondos.'],
-            ['name' => 'Blue Hour Paisaje', 'category' => 'Paisaje', 'iso' => '800', 'aperture' => '8.0', 'shutter_speed' => '1/30', 'white_balance' => '4500K', 'exposure_compensation' => 0, 'notes' => 'Trípode obligatorio. 20-30min tras atardecer. Tonos azules puros.'],
+            ['equipment_id' => $cam1, 'name' => 'Golden Hour Bodas', 'category' => 'Bodas', 'iso' => '400', 'aperture' => '1.8', 'shutter_speed' => '1/200', 'white_balance' => '5600K', 'exposure_compensation' => 0, 'notes' => 'Perfecto para exteriores al atardecer. Añade calidez natural a los tonos piel.'],
+            ['equipment_id' => $cam1, 'name' => 'Ceremonia Interior', 'category' => 'Bodas', 'iso' => '3200', 'aperture' => '1.4', 'shutter_speed' => '1/100', 'white_balance' => '3800K', 'exposure_compensation' => 1, 'notes' => 'Para iglesias y salones con poca luz. Cuidado con el ruido en sombras.'],
+            ['equipment_id' => $cam1, 'name' => 'Retrato Natural Exterior', 'category' => 'Retrato', 'iso' => '200', 'aperture' => '2.0', 'shutter_speed' => '1/500', 'white_balance' => 'Auto', 'exposure_compensation' => 0, 'notes' => 'Luz de día nublado. Difusor natural. Ideal para retratos suaves.'],
+            ['equipment_id' => $cam1, 'name' => 'Retrato Estudio Blanco', 'category' => 'Retrato', 'iso' => '100', 'aperture' => '8.0', 'shutter_speed' => '1/160', 'white_balance' => '5500K', 'exposure_compensation' => 0, 'notes' => 'Fondo blanco con Profoto. Setup 3 puntos de luz.'],
+            ['equipment_id' => $cam2, 'name' => 'BN Dramático Evento', 'category' => 'Evento', 'iso' => '1600', 'aperture' => '2.8', 'shutter_speed' => '1/250', 'white_balance' => 'Auto', 'exposure_compensation' => -1, 'notes' => 'Blanco y negro en postpro. Alto contraste. Muy impactante para discursos.'],
+            ['equipment_id' => $cam2, 'name' => 'Producto Mesa Luz', 'category' => 'Producto', 'iso' => '100', 'aperture' => '11.0', 'shutter_speed' => '1/125', 'white_balance' => '5000K', 'exposure_compensation' => 0, 'notes' => 'Mesa de luz LED + rebotador. Objetos pequeños. Máxima nitidez.'],
+            ['equipment_id' => $cam2, 'name' => 'Food Editorial', 'category' => 'Gastronomía', 'iso' => '200', 'aperture' => '3.2', 'shutter_speed' => '1/200', 'white_balance' => '5200K', 'exposure_compensation' => 1, 'notes' => 'Luz ventana lateral + reflector. Bokeh suave en fondos.'],
+            ['equipment_id' => $cam2, 'name' => 'Blue Hour Paisaje', 'category' => 'Paisaje', 'iso' => '800', 'aperture' => '8.0', 'shutter_speed' => '1/30', 'white_balance' => '4500K', 'exposure_compensation' => 0, 'notes' => 'Trípode obligatorio. 20-30min tras atardecer. Tonos azules puros.'],
         ];
 
         foreach ($presetsData as $preset) {
